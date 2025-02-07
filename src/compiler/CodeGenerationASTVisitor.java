@@ -160,54 +160,54 @@ public class CodeGenerationASTVisitor extends BaseASTVisitor<String, VoidExcepti
 		String l1 = freshLabel();
 		String l2 = freshLabel();
 		return nlJoin(
-				visit(n.exp),         // Genera il codice per l'espressione
-				"push 1",             // Pusha 1 sulla pila
-				"beq " + l1,          // Se l'espressione è true (1), salta a l1
-				"push 1",             // Se l'espressione è false (0), metti true (1)
-				"b " + l2,            // Salta a l2
-				l1 + ":",             // Etichetta l1 (per caso in cui l'espressione è true)
-				"push 0",             // Pusha 0 sulla pila (perché !true è false)
-				l2 + ":"              // Etichetta l2 (fine)
+				visit(n.exp),	// Espressione da negare
+				"push 1",				// Pusha 1 sulla pila
+				"beq " + l1,			// Se l'espressione è true (1), salta a l1
+				"push 1",				// Se l'espressione è false (0), metti true (1)
+				"b " + l2,				// Salta a l2
+				l1 + ":",				// Etichetta l1
+				"push 0",				// Pusha 0 sulla pila (perché !true è false)
+				l2 + ":"				// Etichetta l2 (fine, !false)
 		);
 	}
 
 	@Override
 	public String visitNode(OrNode n) {
 		if (print) printNode(n);
-		String l1 = freshLabel(); // Etichetta per il salto se uno degli operandi è vero
-		String l2 = freshLabel(); // Etichetta per il fine dell'operazione
+		String l1 = freshLabel();
+		String l2 = freshLabel();
 		return nlJoin(
-				visit(n.left),        // Genera il codice per il primo operando
-				"push 1",             // Pusha 1 sulla pila
-				"beq " + l1,          // Se il primo operando è vero, salta a l1
-				visit(n.right),       // Genera il codice per il secondo operando
-				"push 1",             // Pusha 1 sulla pila
-				"beq " + l1,          // Se il secondo operando è vero, salta a l1
-				"push 0",             // Se entrambi gli operandi sono falsi, pusha 0
-				"b " + l2,            // Salta a l2 (fine dell'operazione)
-				l1 + ":",             // Etichetta l1 (caso in cui uno degli operandi è vero)
-				"push 1",             // Pusha 1 (risultato dell'OR)
-				l2 + ":"              // Etichetta l2 (fine dell'operazione)
+				visit(n.left),	// Primo operando
+				"push 1",				// Pusha 1 sulla pila
+				"beq " + l1,			// Se il primo operando è vero, salta a l1
+				visit(n.right),			// Secondo operando
+				"push 1",				// Pusha 1 sulla pila
+				"beq " + l1,			// Se il secondo operando è vero, salta a l1
+				"push 0",				// Se entrambi gli operandi sono falsi, pusha 0
+				"b " + l2,				// Salta a l2
+				l1 + ":",				// Etichetta l1 (caso in cui uno degli operandi è vero)
+				"push 1",				// Pusha 1
+				l2 + ":"				// Etichetta l2 (fine dell'operazione)
 		);
 	}
 
 	@Override
 	public String visitNode(AndNode n) {
 		if (print) printNode(n);
-		String l1 = freshLabel(); // Etichetta per il salto se uno degli operandi è falso
-		String l2 = freshLabel(); // Etichetta per il fine dell'operazione
+		String l1 = freshLabel();
+		String l2 = freshLabel();
 		return nlJoin(
-				visit(n.left),        // Genera il codice per il primo operando
-				"push 0",             // Pusha 0 sulla pila
-				"beq " + l1,          // Se il primo operando è falso, salta a l1
-				visit(n.right),       // Genera il codice per il secondo operando
-				"push 0",             // Pusha 0 sulla pila
-				"beq " + l1,          // Se il secondo operando è falso, salta a l1
-				"push 1",             // Se entrambi gli operandi sono veri, pusha 1
-				"b " + l2,            // Salta a l2 (fine dell'operazione)
-				l1 + ":",             // Etichetta l1 (caso in cui uno degli operandi è falso)
-				"push 0",             // Pusha 0 (risultato dell'AND)
-				l2 + ":"              // Etichetta l2 (fine dell'operazione)
+				visit(n.left),	// Primo operando
+				"push 0",				// Pusha 0 sulla pila
+				"beq " + l1,			// Se il primo operando è falso, salta a l1
+				visit(n.right),			// Secondo operando
+				"push 0",				// Pusha 0 sulla pila
+				"beq " + l1,			// Se il secondo operando è falso, salta a l1
+				"push 1",				// Se entrambi gli operandi sono veri, pusha 1
+				"b " + l2,				// Salta a l2
+				l1 + ":",				// Etichetta l1 (caso in cui uno degli operandi è falso)
+				"push 0",				// Pusha 0
+				l2 + ":"				// Etichetta l2 (fine dell'operazione)
 		);
 	}
 
@@ -217,16 +217,16 @@ public class CodeGenerationASTVisitor extends BaseASTVisitor<String, VoidExcepti
 		String l1 = freshLabel();
 		String l2 = freshLabel();
 		return nlJoin(
-				visit(n.left),    // Genera il codice per il primo operando
-				visit(n.right),          // Genera il codice per il secondo operando
-				"sub",                   // Sottrai il secondo operando dal primo
-				"push 0",                // Pusha 0 sulla pila
-				"bleq " + l1,            // Se il risultato della sottrazione è <= 0, salta a l1
-				"push 0",                // Se il risultato della sottrazione è > 0, pusha 0
-				"b " + l2,               // Salta a l2 (fine dell'operazione)
-				l1 + ":",                // Etichetta l1 (caso in cui la sottrazione è <= 0)
-				"push 1",                // Pusha 1 (perché il primo operando è minore o uguale al secondo)
-				l2 + ":"                 // Etichetta l2 (fine dell'operazione)
+				visit(n.left),	// Primo operando
+				visit(n.right),			// Secondo operando
+				"sub",					// Sottrai il secondo operando dal primo
+				"push 0",				// Pusha 0 sulla pila
+				"bleq " + l1,			// Se il risultato della sottrazione è <= 0, salta a l1
+				"push 0",				// Il risultato della sottrazione è > 0, pusha 0
+				"b " + l2,				// Salta a l2
+				l1 + ":",				// Etichetta l1 (caso in cui la sottrazione è <= 0)
+				"push 1",				// Pusha 1 (perché il primo operando è minore o uguale al secondo)
+				l2 + ":"				// Etichetta l2 (fine dell'operazione)
 		);
 	}
 
@@ -236,16 +236,16 @@ public class CodeGenerationASTVisitor extends BaseASTVisitor<String, VoidExcepti
 		String l1 = freshLabel();
 		String l2 = freshLabel();
 		return nlJoin(
-				visit(n.right),   // Genera il codice per il primo operando
-				visit(n.left),           // Genera il codice per il secondo operando
-				"sub",                   // Sottrai il secondo operando dal primo
-				"push 0",                // Pusha 0 sulla pila
-				"bleq " + l1,            // Se il risultato della sottrazione è <= 0, salta a l1
-				"push 0",                // Se il risultato della sottrazione è > 0, pusha 0
-				"b " + l2,               // Salta a l2 (fine dell'operazione)
-				l1 + ":",                // Etichetta l1 (caso in cui la sottrazione è <= 0)
-				"push 1",                // Pusha 1 (perché il primo operando è minore o uguale al secondo)
-				l2 + ":"                 // Etichetta l2 (fine dell'operazione)
+				visit(n.right),	// Primo operando
+				visit(n.left),			// Secondo operando
+				"sub",					// Sottrai il secondo operando dal primo
+				"push 0",				// Pusha 0 sulla pila
+				"bleq " + l1,			// Se il risultato della sottrazione è <= 0, salta a l1
+				"push 0",				// Se il risultato della sottrazione è > 0, pusha 0
+				"b " + l2,				// Salta a l2
+				l1 + ":",				// Etichetta l1 (caso in cui la sottrazione è <= 0)
+				"push 1",				// Pusha 1 (perché il primo operando è minore o uguale al secondo)
+				l2 + ":"				// Etichetta l2 (fine dell'operazione)
 		);
 	}
 
