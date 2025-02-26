@@ -1,4 +1,4 @@
-## A simple compiler for the F.O.O.L. language, based on the ANTLR library.
+## A simple compiler for the F.O.O.L. language, based on the ANTLR parser generator.
 
 The compiler, overall, consists of:
 - Lexer
